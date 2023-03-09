@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.0.4'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id 'com.google.protobuf' version '0.9.1'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+def grpcVersion = '1.52.0' // CURRENT_GRPC_VERSION
+def protobufVersion = '3.21.7'
+def protocVersion = protobufVersion
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+
+    implementation "io.grpc:grpc-protobuf:${grpcVersion}"
+    implementation "io.grpc:grpc-stub:${grpcVersion}"
+    implementation "io.grpc:grpc-netty-shaded:${grpcVersion}"
+
+    compileOnly "org.apache.tomcat:annotations-api:6.0.53"
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'com.google.code.gson:gson:2.10.1'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+protobuf {
+    protoc { artifact = "com.google.protobuf:protoc:${protocVersion}" }
+    plugins {
+        grpc { artifact = "io.grpc:protoc-gen-grpc-java:${grpcVersion}" }
+    }
+    generateProtoTasks {
+        all()*.plugins { grpc {} }
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'build/generated/source/proto/main/grpc'
+            srcDirs 'build/generated/source/proto/main/java'
+        }
+    }
+}
+
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
